@@ -1,0 +1,31 @@
+use library
+    flutter_riverpod2.0
+    convex_bottom_bar: ^3.2.0
+    firebase_core
+    firebase_auth
+    firebase_database
+
+function
+    home
+        gate of nibuichi
+    ranking
+        top100
+        player's ranking number
+    item shop
+        up challenge
+    setting
+        logout
+
+directory
+    screens
+        homes
+        rankings
+        item_shops
+        settings
+        logins
+
+    directory
+        screens
+            screen
+                ui
+                data
