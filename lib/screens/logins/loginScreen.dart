@@ -1,21 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/user_provider.dart';
+import '../../providers/nibuser_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class LoginScreen extends StatelessWidget{
+const uiList = [SignInUI(), SignUpUI()];
+
+////////////////////////////////////////////////////////////////////////////////
+
+class LoginScreen extends ConsumerWidget{
   const LoginScreen({super.key});
 
   @override
-  Widget build(context){
+  Widget build(context, ref){
+    final index = ref.watch(nibuIndexProvider);
+
     return Scaffold(
         appBar: AppBar(
           title: const Center(child: Text("Home")),
           backgroundColor: Colors.green[400],
         ),
-        body: const SignInUI()
+        body: uiList[index]
     );
   }
 }
@@ -30,7 +36,7 @@ class SignInUI extends ConsumerWidget{
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
-    final user = ref.watch(userProvider);
+    final nibuser = ref.watch(nibuserProvider);
 
     return Center(
       child: Form(
@@ -38,7 +44,7 @@ class SignInUI extends ConsumerWidget{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Center(child: Text(user.toString())),
+              Center(child: Text(nibuser.toString())),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: TextFormField(
@@ -63,16 +69,25 @@ class SignInUI extends ConsumerWidget{
                 children: [
                   ElevatedButton.icon(
                     onPressed: (){
-                      if(formKey.currentState?.validate() == true){
-                        ref.read(userProvider.notifier).state = User(email: emailController.text, password: passwordController.text);
-                      }
+                      ref.read(nibuIndexProvider.notifier).state = 1;
                     },
                     icon: const Icon(Icons.add_circle_outline),
                     label: const Text("go sign up"),
                   ),
                   ElevatedButton.icon(
-                    onPressed: (){
-
+                    onPressed: () async {
+                      try{
+                        final credential = FirebaseAuth.instance.signInWithEmailAndPassword(
+                            email: emailController.text,
+                            password: passwordController.text
+                        );
+                      } on FirebaseAuthException catch (e) {
+                        if(e.code == "user-not-found"){
+                          debugPrint("No user found for that email.");
+                        }else if(e.code == "wrong-password"){
+                          debugPrint("Wrong password provided for that user.");
+                        }
+                      }
                     },
                     icon: const Icon(Icons.login),
                     label: const Text("sign in"),
@@ -93,11 +108,9 @@ class SignUpUI extends ConsumerWidget{
 
   @override
   Widget build(context, ref){
-    String email = "";
-    String password = "";
-    final controller = TextEditingController();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
-
 
     return Center(
       child: Form(
@@ -108,7 +121,7 @@ class SignUpUI extends ConsumerWidget{
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: TextFormField(
-                  controller: controller,
+                  controller: emailController,
                   decoration: const InputDecoration(
                     hintText: "Input new email"
                   ),
@@ -117,7 +130,7 @@ class SignUpUI extends ConsumerWidget{
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: TextFormField(
-                  controller: controller,
+                  controller: passwordController,
                   obscureText:  true,
                   decoration: const InputDecoration(
                     hintText: "Input new password"
@@ -128,9 +141,25 @@ class SignUpUI extends ConsumerWidget{
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   ElevatedButton.icon(
-                      onPressed: (){
+                      onPressed: () async {
                         if(formKey.currentState?.validate() == true){
-                          email = controller.text;
+                          try{
+                            final credential = FirebaseAuth.instance.createUserWithEmailAndPassword(
+                                email: emailController.text,
+                                password: passwordController.text
+                            );
+                            ref.read(nibuserProvider.notifier).state = Nibuser(email: emailController.text, password: passwordController.text);
+                            emailController.text = "";
+                            passwordController.text = "";
+                          }on FirebaseAuthException catch (e) {
+                            if(e.code == "weak-password"){
+                              debugPrint("The password provided is too weak.");
+                            }else if(e.code == "email-already-in-use"){
+                              debugPrint("The account already exists for that email.");
+                            }
+                          } catch (e) {
+                            debugPrint(e.toString());
+                          }
                         }
                       },
                       icon: const Icon(Icons.add_circle_outline),
@@ -138,7 +167,7 @@ class SignUpUI extends ConsumerWidget{
                   ),
                   ElevatedButton.icon(
                       onPressed: (){
-
+                        ref.read(nibuIndexProvider.notifier).state = 0;
                       },
                       icon: const Icon(Icons.login),
                       label: const Text("go sign in"),

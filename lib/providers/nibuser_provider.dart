@@ -3,8 +3,8 @@ import 'package:uuid/uuid.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class User{
-  User({
+class Nibuser{
+  Nibuser({
     this.name,
     this.email,
     this.password,
@@ -16,7 +16,7 @@ class User{
   String? password;
   String uuid;
 
-  User.fromJson(Map<String, dynamic> json)
+  Nibuser.fromJson(Map<String, dynamic> json)
     : this(
     name: json["name"] as String,
     email: json["email"] as String,
@@ -54,6 +54,7 @@ class User{
 
 ////////////////////////////////////////////////////////////////////////////////
 
-final userProvider = StateProvider<User>((ref) => User());
+final nibuserProvider = StateProvider<Nibuser>((ref) => Nibuser());
+final nibuIndexProvider = StateProvider((ref) => 0);
 // final emailProvider = StateProvider<String>((ref) => "");
 // final passwordProvider = StateProvider<String>((ref) => "");
