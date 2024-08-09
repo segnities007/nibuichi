@@ -55,6 +55,6 @@ class Nibuser{
 ////////////////////////////////////////////////////////////////////////////////
 
 final nibuserProvider = StateProvider<Nibuser>((ref) => Nibuser());
-final nibuIndexProvider = StateProvider((ref) => 0);
+final nibuIndexProvider = StateProvider((ref) => 2);
 // final emailProvider = StateProvider<String>((ref) => "");
 // final passwordProvider = StateProvider<String>((ref) => "");

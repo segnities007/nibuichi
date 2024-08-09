@@ -1,11 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../providers/nibuser_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const uiList = [SignInUI(), SignUpUI()];
+const uiList = [SignInUI(), SignUpUI(), SplashScreen()];
+
+////////////////////////////////////////////////////////////////////////////////
+
+class SplashScreen extends StatefulWidget{
+  const SplashScreen({super.key});
+
+  @override
+  StateSplashScreen createState() => StateSplashScreen();
+}
+
+class StateSplashScreen extends State<SplashScreen>{
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_){
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        context.go("/hub");
+      }else{
+        context.go("/");
+      }
+    });
+  }
+
+  @override
+  Widget build(context){
+    return const Center(
+      child: Text("welcome"),
+    );
+  }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -28,15 +61,22 @@ class LoginScreen extends ConsumerWidget{
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class SignInUI extends ConsumerWidget{
+class SignInUI extends ConsumerStatefulWidget{
   const SignInUI({super.key});
 
   @override
-  Widget build(context, ref){
+  StateSignInUI createState() => StateSignInUI();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+class StateSignInUI extends ConsumerState<SignInUI>{
+
+  @override
+  Widget build(context){
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
-    final nibuser = ref.watch(nibuserProvider);
 
     return Center(
       child: Form(
@@ -44,7 +84,7 @@ class SignInUI extends ConsumerWidget{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Center(child: Text(nibuser.toString())),
+              const Center(child: Text("login")),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: TextFormField(
@@ -76,21 +116,26 @@ class SignInUI extends ConsumerWidget{
                   ),
                   ElevatedButton.icon(
                     onPressed: () async {
-                      try{
-                        final credential = FirebaseAuth.instance.signInWithEmailAndPassword(
-                            email: emailController.text,
-                            password: passwordController.text
+                      try {
+                        final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+                          email: emailController.text,
+                          password: passwordController.text,
                         );
+                        if (credential.user != null) {
+                          context.go("/hub");
+                        }
                       } on FirebaseAuthException catch (e) {
-                        if(e.code == "user-not-found"){
+                        if (e.code == "user-not-found") {
                           debugPrint("No user found for that email.");
-                        }else if(e.code == "wrong-password"){
+                        } else if (e.code == "wrong-password") {
                           debugPrint("Wrong password provided for that user.");
+                        } else {
+                          debugPrint("Sign-in failed: $e");
                         }
                       }
                     },
                     icon: const Icon(Icons.login),
-                    label: const Text("sign in"),
+                    label: const Text("Sign In"),
                   )
                 ],
               )
@@ -103,11 +148,19 @@ class SignInUI extends ConsumerWidget{
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class SignUpUI extends ConsumerWidget{
+class SignUpUI extends ConsumerStatefulWidget{
   const SignUpUI({super.key});
 
   @override
-  Widget build(context, ref){
+  StateSignUpUI createState() => StateSignUpUI();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+class StateSignUpUI extends ConsumerState<SignUpUI>{
+
+  @override
+  Widget build(context){
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
@@ -144,7 +197,7 @@ class SignUpUI extends ConsumerWidget{
                       onPressed: () async {
                         if(formKey.currentState?.validate() == true){
                           try{
-                            final credential = FirebaseAuth.instance.createUserWithEmailAndPassword(
+                            FirebaseAuth.instance.createUserWithEmailAndPassword(
                                 email: emailController.text,
                                 password: passwordController.text
                             );
@@ -182,4 +235,3 @@ class SignUpUI extends ConsumerWidget{
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1076688965331",
+    "project_id": "nibuichi-13ee2",
+    "storage_bucket": "nibuichi-13ee2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1076688965331:android:28bce08b405dfeb5cbce26",
+        "android_client_info": {
+          "package_name": "com.example.nibuichi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCV17r-aLS2_7WXtQEGO_d0vCjT1undfiw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
