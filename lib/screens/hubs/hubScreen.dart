@@ -2,6 +2,7 @@ import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nibuichi/providers/hub_provider.dart';
+import 'package:nibuichi/screens/common_uis/appbar.dart';
 import 'hubs.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -11,13 +12,10 @@ class HubScreen extends ConsumerWidget{
 
   @override
   Widget build(context, ref){
-    final itemIndex = ref.watch(indexProvider);
+    final itemIndex = ref.watch(hubIndexProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Center(child: Text("Home")),
-        backgroundColor: Colors.green[400],
-      ),
+      appBar: commonAppBar,
       body: footerItemList[itemIndex],
       bottomNavigationBar: ConvexAppBar(
         items: const [
@@ -28,7 +26,7 @@ class HubScreen extends ConsumerWidget{
         ],
         initialActiveIndex: itemIndex,
         onTap: (index){
-          ref.read(indexProvider.notifier).state = index;
+          ref.read(hubIndexProvider.notifier).state = index;
           },
         backgroundColor: Colors.green[400],
         style: TabStyle.react,
@@ -40,3 +38,5 @@ class HubScreen extends ConsumerWidget{
 ////////////////////////////////////////////////////////////////////////////////
 
 const footerItemList = [HomeUI(), RankingUI(), ItemShopUI(), SettingUI()];
+
+////////////////////////////////////////////////////////////////////////////////

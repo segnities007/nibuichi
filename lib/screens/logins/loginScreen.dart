@@ -1,33 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:nibuichi/screens/common_uis/button_style.dart';
 import '../../providers/nibuser_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 
 const uiList = [SignInUI(), SignUpUI(), SplashScreen()];
+const double n = 8.5;
+const double padding  = 32;
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class SplashScreen extends StatefulWidget{
+class SplashScreen extends ConsumerStatefulWidget{
   const SplashScreen({super.key});
 
   @override
   StateSplashScreen createState() => StateSplashScreen();
 }
 
-class StateSplashScreen extends State<SplashScreen>{
+class StateSplashScreen extends ConsumerState<SplashScreen>{
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_){
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         context.go("/hub");
       }else{
-        context.go("/");
+        ref.read(nibuIndexProvider.notifier).state = 0;
       }
     });
   }
@@ -84,9 +87,9 @@ class StateSignInUI extends ConsumerState<SignInUI>{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Center(child: Text("login")),
+              const Center(child: Text("sign in")),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(padding),
                 child: TextFormField(
                   decoration: const InputDecoration(
                     hintText: "Input your email"
@@ -95,7 +98,7 @@ class StateSignInUI extends ConsumerState<SignInUI>{
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(padding),
                 child: TextFormField(
                   decoration: const InputDecoration(
                     hintText: "Input your password"
@@ -104,40 +107,45 @@ class StateSignInUI extends ConsumerState<SignInUI>{
                   controller: passwordController,
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: (){
-                      ref.read(nibuIndexProvider.notifier).state = 1;
-                    },
-                    icon: const Icon(Icons.add_circle_outline),
-                    label: const Text("go sign up"),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      try {
-                        final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-                          email: emailController.text,
-                          password: passwordController.text,
-                        );
-                        if (credential.user != null) {
-                          context.go("/hub");
+              Padding(
+                  padding: const EdgeInsets.all(padding),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      style: buttonStyle(n: n),
+                      onPressed: (){
+                        ref.read(nibuIndexProvider.notifier).state = 1;
+                      },
+                      icon: const Icon(Icons.add_circle_outline),
+                      label: const Text("go sign up"),
+                    ),
+                    ElevatedButton.icon(
+                      style: buttonStyle(n: n),
+                      onPressed: () async {
+                        try {
+                          final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+                            email: emailController.text,
+                            password: passwordController.text,
+                          );
+                          if (credential.user != null) {
+                            context.go("/hub");
+                          }
+                        } on FirebaseAuthException catch (e) {
+                          if (e.code == "user-not-found") {
+                            debugPrint("No user found for that email.");
+                          } else if (e.code == "wrong-password") {
+                            debugPrint("Wrong password provided for that user.");
+                          } else {
+                            debugPrint("Sign-in failed: $e");
+                          }
                         }
-                      } on FirebaseAuthException catch (e) {
-                        if (e.code == "user-not-found") {
-                          debugPrint("No user found for that email.");
-                        } else if (e.code == "wrong-password") {
-                          debugPrint("Wrong password provided for that user.");
-                        } else {
-                          debugPrint("Sign-in failed: $e");
-                        }
-                      }
-                    },
-                    icon: const Icon(Icons.login),
-                    label: const Text("Sign In"),
-                  )
-                ],
+                      },
+                      icon: const Icon(Icons.login),
+                      label: const Text("Sign In"),
+                    )
+                  ],
+                ),
               )
             ],
           )
@@ -171,8 +179,9 @@ class StateSignUpUI extends ConsumerState<SignUpUI>{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const Center(child: Text("sign up")),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(padding),
                 child: TextFormField(
                   controller: emailController,
                   decoration: const InputDecoration(
@@ -181,7 +190,7 @@ class StateSignUpUI extends ConsumerState<SignUpUI>{
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(padding),
                 child: TextFormField(
                   controller: passwordController,
                   obscureText:  true,
@@ -190,10 +199,13 @@ class StateSignUpUI extends ConsumerState<SignUpUI>{
                   ),
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton.icon(
+              Padding(
+                  padding: const EdgeInsets.all(padding),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      style: buttonStyle(n: n),
                       onPressed: () async {
                         if(formKey.currentState?.validate() == true){
                           try{
@@ -216,16 +228,18 @@ class StateSignUpUI extends ConsumerState<SignUpUI>{
                         }
                       },
                       icon: const Icon(Icons.add_circle_outline),
-                    label: const Text("sign up"),
-                  ),
-                  ElevatedButton.icon(
+                      label: const Text("sign up"),
+                    ),
+                    ElevatedButton.icon(
+                      style: buttonStyle(n: n),
                       onPressed: (){
                         ref.read(nibuIndexProvider.notifier).state = 0;
                       },
                       icon: const Icon(Icons.login),
                       label: const Text("go sign in"),
-                  )
-                ],
+                    )
+                  ],
+                ),
               )
             ],
           )
