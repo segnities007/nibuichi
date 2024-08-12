@@ -13,7 +13,7 @@ final resultProvider = StateProvider.autoDispose((ref) => "");
 
 ////////////////////////////////////////////////////////////////////////////////
 
-final gameIndexProvider = StateProvider.autoDispose<int>((ref) => 0);
+final gameIndexProvider = StateProvider.autoDispose((ref) => "game");
 final scoreProvider = StateProvider.autoDispose<int>((ref) => 0);
 
 ////////////////////////////////////////////////////////////////////////////////

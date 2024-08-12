@@ -15,7 +15,9 @@ class SettingUI extends StatelessWidget{
             width: double.infinity,
             child: ElevatedButton(
                 onPressed: () async {
-                  FirebaseAuth.instance.signOut();
+                  final user = FirebaseAuth.instance.currentUser;
+                  await FirebaseAuth.instance.signOut();
+                  await user?.delete();
                   context.go("/");
                 },
                 child: const Text("sign out")

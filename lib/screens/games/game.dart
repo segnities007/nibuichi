@@ -9,7 +9,7 @@ import '../common_uis/button_style.dart';
 
 const double n = 8.5;
 const double padding = 32;
-const screenUI = [GameUI(), ResultUI()];
+const screenUI = {"game-ui": GameUI(), "result-ui": ResultUI()};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -21,6 +21,7 @@ class GameScreen extends ConsumerWidget{
     final index = ref.watch(gameIndexProvider);
     ref.watch(scoreProvider); // this code can have score until go home.
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: commonAppBar,
       body: screenUI[index]
     );
@@ -65,7 +66,7 @@ class GameUI extends ConsumerWidget{
                     style: buttonStyle(n: n),
                     onPressed: (){
                       ref.read(lhProvider.notifier).state= isSmallNumber(x, y);
-                      ref.read(gameIndexProvider.notifier).state = 1;
+                      ref.read(gameIndexProvider.notifier).state = "result-ui";
                     },
                     child: const Text("High")
                 ),
@@ -73,7 +74,7 @@ class GameUI extends ConsumerWidget{
                     style: buttonStyle(n: n),
                     onPressed: (){
                       ref.read(lhProvider.notifier).state= isSmallNumber(y, x);
-                      ref.read(gameIndexProvider.notifier).state = 1;
+                      ref.read(gameIndexProvider.notifier).state = "result-ui";
                     },
                     child: const Text("Low")
                 )
@@ -136,7 +137,10 @@ class SuccessUI extends ConsumerWidget{
                   style: buttonStyle(n: n),
                   onPressed: (){
                     ref.read(scoreProvider.notifier).state++;
-                    ref.read(gameIndexProvider.notifier).state = 0;
+                    ref.read(gameIndexProvider.notifier).state = "game-ui";
+
+                    //TODO push score to database.
+
                   },
                   child: const Text("next game")
               ),

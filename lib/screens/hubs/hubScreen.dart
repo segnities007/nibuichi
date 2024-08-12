@@ -14,7 +14,9 @@ class HubScreen extends ConsumerWidget{
   Widget build(context, ref){
     final itemIndex = ref.watch(hubIndexProvider);
 
+
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: commonAppBar,
       body: footerItemList[itemIndex],
       bottomNavigationBar: ConvexAppBar(
@@ -37,6 +39,6 @@ class HubScreen extends ConsumerWidget{
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const footerItemList = [HomeUI(), RankingUI(), ItemShopUI(), SettingUI()];
+final footerItemList = [const HomeUI(), RankingUI(), const ItemShopUI(), const SettingUI()];
 
 ////////////////////////////////////////////////////////////////////////////////
