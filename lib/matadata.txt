@@ -29,3 +29,7 @@ directory
             screen
                 ui
                 data
+
+TODO add error message of loginScreen when fail sign in and sign up.
+TODO rankigns system
+TODO shop and item system
