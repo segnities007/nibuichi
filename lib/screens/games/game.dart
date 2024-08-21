@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nibuichi/providers/game_provider.dart';
-import 'package:nibuichi/screens/common_uis/common_uis.dart';
-import '../common_uis/button_style.dart';
+import 'package:nibuichi/screens/games/uis/uis.dart';
+import '../commons/common_data.dart';
+import '../commons/appbar.dart';
+import '../commons/button_style.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-const double n = 8.5;
-const double padding = 32;
-const screenUI = {"game-ui": GameUI(), "result-ui": ResultUI()};
+const screenUI = {
+  "game-ui": GameUI(),
+  "result-ui": ResultUI()
+};
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -19,7 +22,7 @@ class GameScreen extends ConsumerWidget{
   @override
   Widget build(context, ref){
     final index = ref.watch(gameIndexProvider);
-    ref.watch(scoreProvider); // this code can have score until go home.
+    ref.watch(scoreProvider);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: commonAppBar,
@@ -37,7 +40,7 @@ class GameUI extends ConsumerWidget{
   Widget build(context, ref){
     final x = ref.watch(xProvider);
     final y = ref.watch(yProvider);
-    final resultHL = ref.watch(lhProvider);
+    final result = ref.watch(lhProvider);
 
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -47,12 +50,12 @@ class GameUI extends ConsumerWidget{
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(30),
+                  padding: const EdgeInsets.all(32),
                   child: Text("$x"),
                 ),
                 Padding(
-                    padding: const EdgeInsets.all(30),
-                    child: Text(resultHL),
+                    padding: const EdgeInsets.all(32),
+                    child: Text(result),
                 )
               ]
             ),
@@ -91,7 +94,6 @@ class GameUI extends ConsumerWidget{
             child: const Text("hub"),
           ),
         )
-
       ],
     );
   }
@@ -112,81 +114,6 @@ class ResultUI extends ConsumerWidget{
     }else{
       return const FailUI();
     }
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-class SuccessUI extends ConsumerWidget{
-  const SuccessUI({super.key});
-
-  @override
-  Widget build(context, ref){
-    return Column(
-      children: [
-        const Expanded(
-          flex: 1,
-          child: Center(
-            child: Text("Clear! next"),
-          ),
-        ),
-        Expanded(
-            flex: 1,
-            child: Center(
-              child: ElevatedButton(
-                  style: buttonStyle(n: n),
-                  onPressed: (){
-                    ref.read(scoreProvider.notifier).state++;
-                    ref.read(gameIndexProvider.notifier).state = "game-ui";
-
-                    //TODO push score to database.
-
-                  },
-                  child: const Text("next game")
-              ),
-            )
-        ),
-      ],
-    );
-  }
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-class FailUI extends ConsumerWidget{
-  const FailUI({super.key});
-
-  @override
-  Widget build(context, ref){
-    final score = ref.watch(scoreProvider);
-
-    return Column(
-      children: [
-        Expanded(
-          flex: 1,
-          child: Center(
-            child: Column(
-              children: [
-                const Text("fail"),
-                Text("your score is $score")
-              ],
-            ),
-          ),
-        ),
-        Expanded(
-            flex: 1,
-            child: Center(
-              child: ElevatedButton(
-                  style: buttonStyle(n: n),
-                  onPressed: ()async{
-                    context.go("/hub");
-                  },
-                  child: const Text("back to home")
-              ),
-            )
-        ),
-      ],
-    );
   }
 }
 

@@ -1,0 +1,1 @@
+const String databaseURL = "https://nibuichi-13ee2-default-rtdb.asia-southeast1.firebasedatabase.app/";

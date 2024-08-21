@@ -1,9 +1,20 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nibuichi/providers/hub_provider.dart';
-import 'package:nibuichi/screens/common_uis/appbar.dart';
+import '../commons/appbar.dart';
 import 'hubs.dart';
+
+////////////////////////////////////////////////////////////////////////////////
+
+final footerItemList = [
+  const HomeUI(),
+  const RankingUI(),
+  const ItemShopUI(),
+  const SettingUI()
+];
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -13,7 +24,6 @@ class HubScreen extends ConsumerWidget{
   @override
   Widget build(context, ref){
     final itemIndex = ref.watch(hubIndexProvider);
-
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -36,9 +46,5 @@ class HubScreen extends ConsumerWidget{
     );
   }
 }
-
-////////////////////////////////////////////////////////////////////////////////
-
-final footerItemList = [const HomeUI(), RankingUI(), const ItemShopUI(), const SettingUI()];
 
 ////////////////////////////////////////////////////////////////////////////////

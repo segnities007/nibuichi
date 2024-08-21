@@ -1,26 +1,20 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:nibuichi/providers/login_provider.dart';
-import '../../common_uis/button_style.dart';
-import 'package:nibuichi/screens/logins/common_data.dart';
+import 'package:nibuichi/screens/commons/common_data.dart';
+
+import '../../commons/button_style.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class SignInUI extends ConsumerStatefulWidget{
+class SignInUI extends ConsumerWidget{
   const SignInUI({super.key});
 
   @override
-  StateSignInUI createState() => StateSignInUI();
-}
-
-////////////////////////////////////////////////////////////////////////////////
-
-class StateSignInUI extends ConsumerState<SignInUI>{
-
-  @override
-  Widget build(context){
+  Widget build(context, ref){
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
@@ -66,24 +60,9 @@ class StateSignInUI extends ConsumerState<SignInUI>{
                     ),
                     ElevatedButton.icon(
                       style: buttonStyle(n: n),
-                      onPressed: () async {
-                        try {
-                          final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-                            email: emailController.text,
-                            password: passwordController.text,
-                          );
-                          if (credential.user != null) {
-                            context.go("/hub");
-                          }
-                        } on FirebaseAuthException catch (e) {
-                          if (e.code == "user-not-found") {
-                            debugPrint("No user found for that email.");
-                          } else if (e.code == "wrong-password") {
-                            debugPrint("Wrong password provided for that user.");
-                          } else {
-                            debugPrint("Sign-in failed: $e");
-                          }
-                        }
+                      onPressed: ()async{
+                        final a = await isSuccessSignIn(email: emailController.text, password: passwordController.text, context: context, ref: ref);
+                        a();
                       },
                       icon: const Icon(Icons.login),
                       label: const Text("Sign In"),
@@ -96,4 +75,34 @@ class StateSignInUI extends ConsumerState<SignInUI>{
       ),
     );
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+Future<Function()> isSuccessSignIn({
+  required String email,
+  required String password,
+  required BuildContext context,
+  required WidgetRef ref,
+})async{
+  return ()async{
+    try {
+      final credential = await FirebaseAuth.instanceFor(app: Firebase.app(), ).signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      if (credential.user != null) {
+        ref.read(keyProvider.notifier).dispose();
+        context.go("/hub");
+      }
+    } on FirebaseAuthException catch (e) {
+      if (e.code == "user-not-found") {
+        debugPrint("No user found for that email.");
+      } else if (e.code == "wrong-password") {
+        debugPrint("Wrong password provided for that user.");
+      } else {
+        debugPrint("Sign-in failed: $e");
+      }
+    }
+  };
 }
