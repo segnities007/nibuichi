@@ -27,6 +27,7 @@ dependencies:
   json_annotation: ^4.9.0
   json_serializable: ^6.8.0
   logger: ^2.4.0
+  flutter_hooks: ^0.20.5
 
 dev_dependencies:
   flutter_test:

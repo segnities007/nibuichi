@@ -87,13 +87,11 @@ Future<Function()> isSuccessSignIn({
 })async{
   return ()async{
     try {
-      final credential = await FirebaseAuth.instanceFor(app: Firebase.app(), ).signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      final credential = await FirebaseAuth.instanceFor(app: Firebase.app(), ).signInWithEmailAndPassword(email: email, password: password,);
       if (credential.user != null) {
-        ref.read(keyProvider.notifier).dispose();
-        context.go("/hub");
+        WidgetsBinding.instance.addPostFrameCallback((_){
+          context.go("/hub");
+        });
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == "user-not-found") {

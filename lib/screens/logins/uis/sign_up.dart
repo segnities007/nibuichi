@@ -1,10 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
-import 'package:nibuichi/datas/databaseURL.dart';
+import 'package:nibuichi/datas/firebase.dart';
 import '../../../datas/user_information.dart';
 import '../../../providers/login_provider.dart';
 import 'package:nibuichi/screens/commons/common_data.dart';
@@ -68,8 +67,7 @@ class SignUpUI extends ConsumerWidget{
                     ElevatedButton.icon(
                       style: buttonStyle(n: n),
                       onPressed: ()async{
-                        final a = await createUser(formKey: formKey ,name: nameController.text, email: emailController.text, password: passwordController.text, ref: ref);
-                        a();
+                        await createUser(formKey: formKey ,name: nameController.text, email: emailController.text, password: passwordController.text, context: context);
                       },
                       icon: const Icon(Icons.add_circle_outline),
                       label: const Text("sign up"),
@@ -94,33 +92,30 @@ class SignUpUI extends ConsumerWidget{
 
 ////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////
-
-Future<Function()> createUser({
+Future<void> createUser({
   required formKey,
   required String name,
   required String email,
   required String password,
-  required WidgetRef ref,
+  required BuildContext context,
 })async{
-  return ()async{
-    if(formKey.currentState?.validate() == true){
-      try{
+    if(formKey.currentState?.validate() == true) {
+      try {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
         await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
         final user = UserInformation(highScore: 0);
-        await FirebaseDatabase.instanceFor(app: Firebase.app(), databaseURL: databaseURL)
-            .ref("users/${FirebaseAuth.instance.currentUser!.uid}").set(user.toJson());
-        ref.read(keyProvider.notifier).state = "sign_in";
-      }on FirebaseAuthException catch (e) {
-        if(e.code == "weak-password"){
-          debugPrint("The password provided is too weak.");
-        }else if(e.code == "email-already-in-use"){
-          debugPrint("The account already exists for that email.");
+        await setUserInformationToDB(user: user);
+        WidgetsBinding.instance.addPostFrameCallback((_){
+          context.go("/hub");
+        });
+      } on FirebaseAuthException catch (e) {
+        if (e.code == "weak-password") {
+          Logger().i("The password provided is too weak.");
+        } else if (e.code == "email-already-in-use") {
+          Logger().i("The account already exists for that email.");
         }
       } catch (e) {
         Logger().i(e);
       }
     }
-  };
 }

@@ -1,28 +1,72 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nibuichi/providers/hub_provider.dart';
+import '../settings/uis/uis.dart';
 
-class SettingUI extends StatelessWidget{
+////////////////////////////////////////////////////////////////////////////////
+
+const uiList = {
+  "SettingHomeUI": SettingHomeUI(),
+  "NameUI": NameUI(),
+};
+
+////////////////////////////////////////////////////////////////////////////////
+
+class SettingUI extends ConsumerWidget{
   const SettingUI({super.key});
 
   @override
-  Widget build(context){
-    return Column(
+  Widget build(context, ref){
+    final key = ref.watch(settingKeyProvider);
+    return uiList[key] ?? const SettingHomeUI();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
+class SettingHomeUI extends StatelessWidget{
+  const SettingHomeUI({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
       children: [
-        Padding(
-          padding: const EdgeInsets.all(10),
-          child: SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-                onPressed: () async {
-                  await FirebaseAuth.instance.signOut();
-                  context.go("/");
-                },
-                child: const Text("sign out")
-            ),
-          )
-        )
+        SettingButton(text: "sign out", onPressed: signOut),
+        SettingButton(text: "change name", onPressed: goChangeName)
       ],
     );
   }
 }
+
+////////////////////////////////////////////////////////////////////////////////
+
+class SettingButton extends ConsumerWidget{
+  const SettingButton({
+  super.key,
+  required this.text,
+  this.padding = 20,
+  required this.onPressed,
+  });
+
+  final String text;
+  final double padding;
+  final Future<void> Function(BuildContext, WidgetRef) onPressed;
+  final double elevation = 5;
+
+  @override
+  Widget build(context, ref){
+    return Padding(
+        padding: EdgeInsets.fromLTRB(padding, padding, padding, 0),
+        child: SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(elevation: elevation),
+              onPressed: ()=>onPressed(context, ref),
+              child: Text(text)
+          ),
+        )
+    );
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////

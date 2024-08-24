@@ -1,6 +1,4 @@
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:nibuichi/providers/hub_provider.dart';
@@ -37,9 +35,12 @@ class HubScreen extends ConsumerWidget{
           TabItem(icon: Icons.settings, title: "Setting")
         ],
         initialActiveIndex: itemIndex,
-        onTap: (index){
+        onTap: (index) {
           ref.read(hubIndexProvider.notifier).state = index;
-          },
+          if (index == 3) {
+            ref.read(settingKeyProvider.notifier).state = "SettingHomeUI";
+          }
+        },
         backgroundColor: Colors.green[400],
         style: TabStyle.react,
       ),
