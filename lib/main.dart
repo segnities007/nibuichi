@@ -11,7 +11,8 @@ import 'firebase_options.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 
-final GoRouter _router = GoRouter(routes: [
+final GoRouter _router = GoRouter(
+  routes: [
     GoRoute(
         path: "/hub",
         builder: (context, state) => const HubScreen()
@@ -24,7 +25,7 @@ final GoRouter _router = GoRouter(routes: [
         path: "/game",
       builder: (context, state) => const GameScreen()
     ),
-  ]
+  ],
 );
 
 ////////////////////////////////////////////////////////////////////////////////

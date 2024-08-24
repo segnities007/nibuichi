@@ -5,3 +5,5 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final hubIndexProvider = StateProvider<int>((ref)=>0);
 
 ////////////////////////////////////////////////////////////////////////////////
+
+final settingKeyProvider = StateProvider<String>((ref)=>"SettingHomeUI");
