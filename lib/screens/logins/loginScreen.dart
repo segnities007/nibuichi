@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nibuichi/screens/logins/uis/create_user_infromation.dart';
 import 'package:nibuichi/screens/logins/uis/sign_in.dart';
 import 'package:nibuichi/screens/logins/uis/sign_up.dart';
 import 'package:nibuichi/screens/logins/uis/splash.dart';
@@ -11,6 +12,7 @@ const uiList = {
   "sign-in": SignInUI(),
   "sign-up": SignUpUI(),
   "splash": SplashUI(),
+  "create-user-information": CreateUserInformation(),
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -20,7 +22,7 @@ class LoginScreen extends ConsumerWidget{
 
   @override
   Widget build(context, ref){
-    final indexKey = ref.watch(keyProvider);
+    final indexKey = ref.watch(loginIndexProvider);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,

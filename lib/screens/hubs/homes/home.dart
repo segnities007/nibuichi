@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:nibuichi/datas/firebase.dart';
 import 'package:nibuichi/screens/commons/commons.dart';
+import 'package:nibuichi/screens/commons/id_card.dart';
+
+import '../../../common_logics/firebase.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -15,8 +17,9 @@ class HomeUI extends ConsumerWidget{
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Center(
-          child: Text(FirebaseInstances.auth.currentUser!.displayName.toString()),
+        const Padding(
+          padding: EdgeInsets.all(padding),
+          child: IDCard(),
         ),
         Center(
           child: ElevatedButton(

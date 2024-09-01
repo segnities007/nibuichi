@@ -30,6 +30,6 @@ directory
                 ui
                 data
 
-TODO add error message of loginScreen when fail sign in and sign up.
-TODO rankigns system
+TODO change id_card system
+TODO use firebase storage for image
 TODO shop and item system

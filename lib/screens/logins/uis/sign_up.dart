@@ -1,10 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:logger/logger.dart';
-import 'package:nibuichi/datas/firebase.dart';
-import '../../../datas/user_information.dart';
+import 'package:nibuichi/common_data/user_information.dart';
+import 'package:nibuichi/providers/user_information_provider.dart';
 import '../../../providers/login_provider.dart';
 import 'package:nibuichi/screens/commons/common_data.dart';
 import '../../commons/button_style.dart';
@@ -16,7 +15,7 @@ class SignUpUI extends ConsumerWidget{
 
   @override
   Widget build(context, ref){
-    final nameController = TextEditingController();
+    // final nameController = TextEditingController();
     final emailController = TextEditingController();
     final passwordController = TextEditingController();
     final formKey = GlobalKey<FormState>();
@@ -27,17 +26,17 @@ class SignUpUI extends ConsumerWidget{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Center(child: Text("sign up")),
-              Padding(
-                padding: const EdgeInsets.all(padding),
-                child: TextFormField(
-                  controller: nameController,
-                  keyboardType: TextInputType.text,
-                  decoration: const InputDecoration(
-                      hintText: "Input new name"
-                  ),
-                ),
-              ),
+              // const Center(child: Text("sign up")),
+              // Padding(
+              //   padding: const EdgeInsets.all(padding),
+              //   child: TextFormField(
+              //     controller: nameController,
+              //     keyboardType: TextInputType.text,
+              //     decoration: const InputDecoration(
+              //         hintText: "Input new name"
+              //     ),
+              //   ),
+              // ),
               Padding(
                 padding: const EdgeInsets.all(padding),
                 child: TextFormField(
@@ -67,7 +66,13 @@ class SignUpUI extends ConsumerWidget{
                     ElevatedButton.icon(
                       style: buttonStyle(n: n),
                       onPressed: ()async{
-                        await createUser(formKey: formKey ,name: nameController.text, email: emailController.text, password: passwordController.text, context: context);
+                        await createUser(
+                            formKey: formKey ,
+                            ref: ref,
+                            // name: nameController.text,
+                            email: emailController.text,
+                            password: passwordController.text,
+                            context: context);
                       },
                       icon: const Icon(Icons.add_circle_outline),
                       label: const Text("sign up"),
@@ -75,7 +80,7 @@ class SignUpUI extends ConsumerWidget{
                     ElevatedButton.icon(
                       style: buttonStyle(n: n),
                       onPressed: (){
-                        ref.read(keyProvider.notifier).state = "sign-in";
+                        ref.read(loginIndexProvider.notifier).state = "sign-in";
                       },
                       icon: const Icon(Icons.login),
                       label: const Text("go sign in"),
@@ -94,7 +99,8 @@ class SignUpUI extends ConsumerWidget{
 
 Future<void> createUser({
   required formKey,
-  required String name,
+  required WidgetRef ref,
+  // required String name,
   required String email,
   required String password,
   required BuildContext context,
@@ -102,11 +108,12 @@ Future<void> createUser({
     if(formKey.currentState?.validate() == true) {
       try {
         await FirebaseAuth.instance.createUserWithEmailAndPassword(email: email, password: password);
-        await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
-        final user = UserInformation(highScore: 0);
-        await setUserInformationToDB(user: user);
+        // // await FirebaseAuth.instance.currentUser!.updateDisplayName(name);
+        // final user = UserInformation(highScore: 0);
+        // await setUserInformationToDB(user: user);
         WidgetsBinding.instance.addPostFrameCallback((_){
-          context.go("/hub");
+          ref.read(userInformationProvider.notifier).state = UserInformation(highScore: 0);
+          ref.read(loginIndexProvider.notifier).state = "create-user-information";
         });
       } on FirebaseAuthException catch (e) {
         if (e.code == "weak-password") {

@@ -53,7 +53,7 @@ class SignInUI extends ConsumerWidget{
                     ElevatedButton.icon(
                       style: buttonStyle(n: n),
                       onPressed: (){
-                        ref.read(keyProvider.notifier).state = "sign-up";
+                        ref.read(loginIndexProvider.notifier).state = "sign-up";
                       },
                       icon: const Icon(Icons.add_circle_outline),
                       label: const Text("go sign up"),
@@ -61,8 +61,7 @@ class SignInUI extends ConsumerWidget{
                     ElevatedButton.icon(
                       style: buttonStyle(n: n),
                       onPressed: ()async{
-                        final a = await isSuccessSignIn(email: emailController.text, password: passwordController.text, context: context, ref: ref);
-                        a();
+                        await isSuccessSignIn(email: emailController.text, password: passwordController.text, context: context, ref: ref);
                       },
                       icon: const Icon(Icons.login),
                       label: const Text("Sign In"),
@@ -79,13 +78,12 @@ class SignInUI extends ConsumerWidget{
 
 ////////////////////////////////////////////////////////////////////////////////
 
-Future<Function()> isSuccessSignIn({
+Future<void> isSuccessSignIn({
   required String email,
   required String password,
   required BuildContext context,
   required WidgetRef ref,
 })async{
-  return ()async{
     try {
       final credential = await FirebaseAuth.instanceFor(app: Firebase.app(), ).signInWithEmailAndPassword(email: email, password: password,);
       if (credential.user != null) {
@@ -102,5 +100,4 @@ Future<Function()> isSuccessSignIn({
         debugPrint("Sign-in failed: $e");
       }
     }
-  };
 }

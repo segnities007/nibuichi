@@ -1,62 +1,38 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:logger/logger.dart';
-import 'package:image/image.dart' as img;
-import 'package:nibuichi/datas/firebase.dart';
-import 'dart:typed_data';
-import 'package:path/path.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nibuichi/providers/user_information_provider.dart';
+import '../../../../common_logics/operation_image.dart';
 
-class ChangeIDCard extends StatelessWidget{
+////////////////////////////////////////////////////////////////////////////////
+
+class ChangeIDCard extends ConsumerWidget {
   const ChangeIDCard({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(userInformationProvider);
+
     return Column(
       children: [
+        (user != null && user.imagePath != null)
+            ? Image.file(File(user.imagePath!))
+            : const Text("No image selected"),
         ElevatedButton(
-            onPressed: ()async{
-
-            },
-            child: const Text("change Image")
-        )
+          onPressed: () async {
+            await selectImage(ref: ref);
+          },
+          child: const Text("Change Image"),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            await deleteImage(ref);
+          },
+          child: const Text("Delete Image"),
+        ),
       ],
     );
   }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-Future<void> selectAndUploadImage()async{
-  try{
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
-    if(image == null)return;
-
-    final img.Image? originalImage = img.decodeImage(File(image.path).readAsBytesSync());
-    final img.Image resizedImage = img.copyResize(originalImage!, width: 300);
-    final List<int> resizedBytes = img.encodeBmp(resizedImage);
-    final Uint8List resizedUnit8List = Uint8List.fromList(resizedBytes);
-
-    final uploadTask = await FirebaseInstances.storage.child("image/icon/${basename(image.path)}")
-        .putData(resizedUnit8List);
-
-    final url = await uploadTask.ref.getDownloadURL();
-
-    final Map<String, dynamic> data = {
-      "url": url,
-      "path": "image/${basename(image.path)}"
-    };
-  }catch (e){
-    Logger().i(e);
-  }
-}
-
-Future<void> showImage()async{
-
-}
-
-Future<void> deleteImage()async{
-
-}

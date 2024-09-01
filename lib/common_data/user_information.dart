@@ -5,13 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 class UserInformation{
   UserInformation({
     required this.highScore,
-    name,
-    uid
+    this.name,
+    uid,
+    this.imagePath,
   }): uid = FirebaseAuth.instance.currentUser!.uid;
 
   final String uid;
   int highScore = 0;
   String? name = FirebaseAuth.instance.currentUser!.displayName;
+  String? imagePath;
 
   bool setScore(int score){
     if(highScore < score){
@@ -29,12 +31,14 @@ class UserInformation{
   UserInformation.fromJson(Map<String, dynamic> json)
       : highScore = json["score"],
         name      = json["name"],
-        uid       = json["uid"];
+        uid       = json["uid"],
+        imagePath = json["imagePath"];
 
   Map<String, dynamic> toJson() => {
     "score":  highScore,
     "name":   name,
-    "uid":  uid
+    "uid":  uid,
+    "imagePath": imagePath,
   };
 }
 

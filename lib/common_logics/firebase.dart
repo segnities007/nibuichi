@@ -3,8 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:logger/logger.dart';
-import 'package:nibuichi/datas/user_information.dart';
-import 'databaseURL.dart';
+import 'package:nibuichi/common_data/user_information.dart';
+import '../common_data/databaseURL.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -92,7 +92,6 @@ Future<UserInformation?> getUserInformationOrNullFromDB()async{
       final data = Map<String, dynamic>.from(snapshot.value as Map);
       return UserInformation.fromJson(data);
     }
-
   }catch(e){
     Logger().i(e);
   }

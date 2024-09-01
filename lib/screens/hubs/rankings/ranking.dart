@@ -2,10 +2,11 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:nibuichi/datas/databaseURL.dart';
-import 'package:nibuichi/datas/user_information.dart';
 import 'package:nibuichi/providers/ranking_list_provider.dart';
 import 'package:logger/logger.dart';
+
+import '../../../common_data/databaseURL.dart';
+import '../../../common_data/user_information.dart';
 
 ////////////////////////////////////////////////////////////////////////////////
 
