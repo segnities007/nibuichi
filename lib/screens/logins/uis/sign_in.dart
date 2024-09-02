@@ -3,7 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logger/logger.dart';
+import 'package:nibuichi/common_logics/firebase.dart';
 import 'package:nibuichi/providers/login_provider.dart';
+import 'package:nibuichi/providers/user_information_provider.dart';
 import 'package:nibuichi/screens/commons/common_data.dart';
 
 import '../../commons/button_style.dart';
@@ -87,18 +90,15 @@ Future<void> isSuccessSignIn({
     try {
       final credential = await FirebaseAuth.instanceFor(app: Firebase.app(), ).signInWithEmailAndPassword(email: email, password: password,);
       if (credential.user != null) {
-
+        final userInformation = await getUserInformationOrNullFromDB();
+        if(userInformation != null) {
+          ref.read(userInformationProvider.notifier).state = userInformation;
+        }
         WidgetsBinding.instance.addPostFrameCallback((_){
           context.go("/hub");
         });
       }
-    } on FirebaseAuthException catch (e) {
-      if (e.code == "user-not-found") {
-        debugPrint("No user found for that email.");
-      } else if (e.code == "wrong-password") {
-        debugPrint("Wrong password provided for that user.");
-      } else {
-        debugPrint("Sign-in failed: $e");
-      }
+    }catch (e) {
+        Logger().e;
     }
 }
