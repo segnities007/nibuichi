@@ -87,6 +87,7 @@ Future<void> isSuccessSignIn({
     try {
       final credential = await FirebaseAuth.instanceFor(app: Firebase.app(), ).signInWithEmailAndPassword(email: email, password: password,);
       if (credential.user != null) {
+
         WidgetsBinding.instance.addPostFrameCallback((_){
           context.go("/hub");
         });

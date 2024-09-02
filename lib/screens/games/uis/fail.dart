@@ -54,10 +54,12 @@ Future<void> goNextScreen({
   required BuildContext context,
   required WidgetRef ref,
 })async{
+    calculateCoin(ref: ref, coin: score);
     final judge = await isHighScore(score: score,ref: ref);
     if(judge){
-      await isAddedRanking(score: score);
+      await isAddedRanking(score: score, ref: ref);
     }
+
     WidgetsBinding.instance.addPostFrameCallback((_){
       context.go("/hub");
     });
@@ -65,12 +67,25 @@ Future<void> goNextScreen({
 
 ////////////////////////////////////////////////////////////////////////////////
 
+void calculateCoin({
+  required WidgetRef ref,
+  required int coin,
+}){
+  final user = ref.watch(userInformationProvider);
+  user?.coin += coin*coin;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+
 Future<void> isAddedRanking({
   required int score,
+  required WidgetRef ref,
 })async{
   try{
-    final UserInformation currentUser = UserInformation(highScore: score);
-    await canSetRankingToDB(currentUser: currentUser);
+    final UserInformation? currentUser = ref.watch(userInformationProvider);
+    final user = await getUserInformationOrNullFromDB();
+    ref.read(userInformationProvider.notifier).state = user;
+    await canSetRankingToDB(currentUser: currentUser!);
   }catch (e){
     Logger().i(e);
   }
@@ -83,13 +98,15 @@ Future<bool> isHighScore({
   required WidgetRef ref,
 })async{
   try{
-    final user = await getUserInformationOrNullFromDB();
+    final user = ref.watch(userInformationProvider);
     if(user != null){
       if(user.highScore < score){
         user.setScore(score);
         await setUserInformationToDB(user: user);
         ref.read(userInformationProvider.notifier).state = user;
         return true;
+      }else{
+        await setUserInformationToDB(user: user);
       }
     }
   }catch(e){

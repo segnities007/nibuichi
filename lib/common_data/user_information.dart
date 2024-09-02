@@ -12,8 +12,10 @@ class UserInformation{
 
   final String uid;
   int highScore = 0;
-  String? name = FirebaseAuth.instance.currentUser!.displayName;
+  // String? name = FirebaseAuth.instance.currentUser!.displayName;
+  String? name;
   String? imagePath;
+  int coin = 0;
 
   bool setScore(int score){
     if(highScore < score){
@@ -32,13 +34,15 @@ class UserInformation{
       : highScore = json["score"],
         name      = json["name"],
         uid       = json["uid"],
+        coin      = json["coin"],
         imagePath = json["imagePath"];
 
   Map<String, dynamic> toJson() => {
-    "score":  highScore,
-    "name":   name,
-    "uid":  uid,
-    "imagePath": imagePath,
+    "score":      highScore,
+    "name":       name,
+    "uid":        uid,
+    "coin":       coin,
+    "imagePath":  imagePath,
   };
 }
 

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nibuichi/common_data/user_information.dart';
 import 'package:nibuichi/providers/user_information_provider.dart';
 
 
@@ -27,7 +28,7 @@ class IDCard extends ConsumerWidget{
               ? IconUI(imagePath: user.imagePath)
               : const Text("user isn't exist"),
           (user != null)
-              ? StatusUI(highScore: user.highScore, name: user.name, uid: user.uid)
+              ? StatusUI(user: user)
               : const Text("user isn't exist")
         ],
       ),
@@ -62,24 +63,19 @@ class IconUI extends StatelessWidget{
 class StatusUI extends StatelessWidget{
   const StatusUI({
     super.key,
-    required this.highScore,
-    required this.name,
-    required this.uid,
+    required this.user,
   });
 
-  final int highScore;
-  final String? name;
-  // final int coin;
-  final String uid;
+  final UserInformation user;
 
   @override
   Widget build(context){
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text("name: $name"),
-        Text("highScore: $highScore"),
-        // Text("coin: $coin")
+        Text("name: ${user.name}"),
+        Text("highScore: ${user.highScore}"),
+        Text("coin: ${user.coin}")
       ],
     );
   }

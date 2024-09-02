@@ -24,15 +24,15 @@ class SettingUI extends ConsumerWidget{
 
 ////////////////////////////////////////////////////////////////////////////////
 
-class SettingHomeUI extends StatelessWidget{
+class SettingHomeUI extends ConsumerWidget{
   const SettingHomeUI({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const Column(
+  Widget build(BuildContext context, ref) {
+    return Column(
       children: [
-        SettingButton(text: "sign out", onPressed: signOut),
-        SettingButton(text: "change name", onPressed: goChangeName)
+        SettingButton(text: "sign out", onPressed: (context, ref) => signOut(context: context, ref: ref)),
+        const SettingButton(text: "change name", onPressed: goChangeName),
       ],
     );
   }

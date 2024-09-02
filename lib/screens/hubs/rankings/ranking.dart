@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:nibuichi/common_logics/firebase.dart';
 import 'package:nibuichi/providers/ranking_list_provider.dart';
 import 'package:logger/logger.dart';
 
@@ -83,10 +84,11 @@ class ListUI extends StatelessWidget{
 ////////////////////////////////////////////////////////////////////////////////
 
 void _loadRankings({required WidgetRef ref})async{
-  final FirebaseDatabase rtdb = FirebaseDatabase.instanceFor(app: Firebase.app(), databaseURL: databaseURL);
   try{
-    final snapshot = await rtdb.ref("rankings/users")
-        .orderByChild("score").limitToLast(100).get();
+    final snapshot = await FirebaseInstances.realTimeDB
+        .ref("rankings/users")
+        .orderByChild("score")
+        .limitToLast(100).get();
     if(snapshot.exists){
       // Logger().i("snapshot is existed");
       final users = snapshot.children;
@@ -95,9 +97,6 @@ void _loadRankings({required WidgetRef ref})async{
         final userData = UserInformation.fromJson(Map<String, dynamic>.from(user.value as Map));
         userList.add(userData);
         // Logger().i("userList is added");
-      }
-      if(userList.length < 100){
-
       }
       ref.read(rankingListProvider.notifier).state = userList;
     }

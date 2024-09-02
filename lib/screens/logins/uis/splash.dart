@@ -38,19 +38,32 @@ class StateSplashScreen extends ConsumerState<SplashUI> {
 
 Future<void> _init({required WidgetRef ref, required BuildContext context}) async {
   bool isUserLoggedIn = false;
-  if (FirebaseInstances.auth.currentUser != null) {
-    isUserLoggedIn = true;
-    final user = await getUserInformationOrNullFromDB();
-    if (user != null) {
-      ref.read(userInformationProvider.notifier).state = user;
-    }
-  }
 
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    if (isUserLoggedIn) {
-      context.go("/hub");
-    } else {
-      ref.read(loginIndexProvider.notifier).state = "sign-in";
+  try {
+    if (FirebaseInstances.auth.currentUser != null) {
+      isUserLoggedIn = true;
+      final user = await getUserInformationOrNullFromDB();
+      if (user != null) {
+        Future(() {
+          ref.read(userInformationProvider.notifier).state = user;
+        });
+      }
     }
-  });
+
+    // Logger().i("u");
+
+  } catch (e) {
+    Logger().e(e.toString());
+  } finally {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Logger().i("a");
+      if (isUserLoggedIn) {
+        context.go("/hub");
+      } else {
+        // Future(() {
+          ref.read(loginIndexProvider.notifier).state = "sign-in";
+        // });
+      }
+    });
+  }
 }

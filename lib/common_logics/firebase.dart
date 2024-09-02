@@ -10,47 +10,44 @@ import '../common_data/databaseURL.dart';
 
 class FirebaseInstances{
   static final FirebaseAuth auth = FirebaseAuth.instance;
-  static final DatabaseReference realTimeDB = FirebaseDatabase.instanceFor(app: Firebase.app(), databaseURL: databaseURL).ref();
-  static final Reference storage = FirebaseStorage.instance.ref();
+  static final FirebaseDatabase realTimeDB = FirebaseDatabase.instanceFor(app: Firebase.app(), databaseURL: databaseURL);
+  static final FirebaseStorage storage = FirebaseStorage.instance;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 Future<void> canSetRankingToDB({
   required UserInformation currentUser
-})async{
-  try{
+}) async {
+  try {
     final userList = await getRankingFromDB();
+    bool isExist = false;
 
-    if(userList.isNotEmpty){
-      bool isExist = false;
-      if(userList.first.highScore < currentUser.highScore){
-        isExist = userList.any((user)=>
-          currentUser.uid == user.uid &&
-          currentUser.highScore > user.highScore
-        );
+    for (var user in userList) {
+      if (currentUser.uid == user.uid) {
+        isExist = true;
+        if (currentUser.highScore > user.highScore) {
+          await FirebaseInstances.realTimeDB
+              .ref("rankings/users/${currentUser.uid}")
+              .update(currentUser.toJson());
+        }
+        break;
       }
+    }
 
-      if(isExist){
+    if (!isExist) {
+      if(userList.length >= 100){
         await FirebaseInstances.realTimeDB
-            .child("rankings/users/${currentUser.uid}")
-            .update(currentUser.toJson());
-      }else{
-        await FirebaseInstances.realTimeDB
-            .child("rankings/users/${userList.first.uid}")
+            .ref("rankings/users/${userList.first.uid}")
             .remove();
-        await FirebaseInstances.realTimeDB
-            .child("rankings/users/${currentUser.uid}")
-            .set(currentUser.toJson());
       }
 
-    }else{
-      await FirebaseDatabase.instanceFor(app: Firebase.app(), databaseURL: databaseURL)
+      await FirebaseInstances.realTimeDB
           .ref("rankings/users/${currentUser.uid}")
           .set(currentUser.toJson());
     }
 
-  }catch (e){
+  } catch (e) {
     Logger().i(e);
   }
 }
@@ -61,7 +58,7 @@ Future<List<UserInformation>> getRankingFromDB()async{
   final List<UserInformation> rankings = [];
   try{
     final snapshot = await FirebaseInstances.realTimeDB
-        .child("rankings/users/")
+        .ref("rankings/users/")
         .child("")
         .orderByChild("score")
         .limitToLast(100)
@@ -86,7 +83,7 @@ Future<List<UserInformation>> getRankingFromDB()async{
 Future<UserInformation?> getUserInformationOrNullFromDB()async{
   try{
     final snapshot = await FirebaseInstances.realTimeDB
-        .child("users/${FirebaseAuth.instance.currentUser!.uid}").get();
+        .ref("users/${FirebaseAuth.instance.currentUser!.uid}").get();
 
     if(snapshot.exists){
       final data = Map<String, dynamic>.from(snapshot.value as Map);
@@ -105,9 +102,8 @@ Future<void> setUserInformationToDB({
 })async{
   try{
     await FirebaseInstances.realTimeDB
-        .child("users/${FirebaseAuth.instance.currentUser!.uid}")
+        .ref("users/${FirebaseAuth.instance.currentUser!.uid}")
         .update(user.toJson());
-
   }catch(e){
     Logger().i(e);
   }
